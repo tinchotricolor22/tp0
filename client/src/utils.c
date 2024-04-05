@@ -22,7 +22,7 @@ int crear_conexion(char *ip, char* puerto)
 	struct addrinfo *server_info;
 
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
+	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
@@ -31,8 +31,24 @@ int crear_conexion(char *ip, char* puerto)
 	// Ahora vamos a crear el socket.
 	int socket_cliente = 0;
 
-	// Ahora que tenemos el socket, vamos a conectarlo
+	struct addrinfo *p;
 
+	// Ahora que tenemos el socket, vamos a conectarlo
+	for (p = server_info; p != NULL; p = p->ai_next) {
+        if ((socket_cliente = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
+            continue;
+
+        if (connect(socket_cliente, p->ai_addr, p->ai_addrlen) == -1) {
+            close(socket_cliente);
+            continue;
+        }
+
+        break;
+    }
+
+    if (p == NULL) {
+        return -1;
+    }
 
 	freeaddrinfo(server_info);
 
