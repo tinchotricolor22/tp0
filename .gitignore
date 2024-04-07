@@ -1,2 +1,4 @@
 /.metadata/
 .idea/
+/client/src/commons
+/server/src/commons
